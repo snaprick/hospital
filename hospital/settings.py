@@ -3,7 +3,6 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-a7lj%l&we7^)vrm(=ig)m3r$7_8%1_2&vn8o(9e=3-2i^_4v(z"
 
-
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -18,6 +17,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'rest_framework_simplejwt',
+    'django_filters',
     'drf_spectacular',
     "rest_framework",
     "api",
@@ -107,7 +107,10 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
 }
 
 SPECTACULAR_SETTINGS = {

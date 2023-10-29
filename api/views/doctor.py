@@ -1,29 +1,36 @@
-from rest_framework import viewsets, mixins
-from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins
 from rest_framework.response import Response
 
+from api.filters import DoctorFilterSet
+from api.mixin import HospitalGenericViewSet
 from api.models import Patient, Doctor
-from api.permissions import DoctorAccessPermission, RoleBasedPermissionsMixin
 from api.serializers.doctor import DoctorListSerializer, DoctorRetrieveSerializer, DoctorCreateSerializer, \
     DoctorUpdateSerializer
 from api.serializers.patient import PatientListSerializer
 
 
 class DoctorView(
-    viewsets.GenericViewSet,
+    HospitalGenericViewSet,
     mixins.ListModelMixin,
     mixins.UpdateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    RoleBasedPermissionsMixin
+    mixins.DestroyModelMixin
 ):
     lookup_field = 'id'
 
-    permission_classes = [IsAuthenticated, DoctorAccessPermission]
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_fields = ['first_name', 'last_name', 'specialization']
+    filterset_class = DoctorFilterSet
 
     def get_action_permissions(self):
-        self.action_permissions = []
+        if self.action in ('list', 'retrieve'):
+            self.action_permissions = ['view_doctor', ]
+        elif self.action == 'list_patient':
+            self.action_permissions = ['view_patient', ]
+        else:
+            self.action_permissions = []
 
     def get_serializer_class(self):
         if self.action == 'list':
