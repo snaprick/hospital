@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.models import Patient, Doctor
-from api.permissions import DoctorAccessPermission
+from api.permissions import DoctorAccessPermission, RoleBasedPermissionsMixin
 from api.serializers.doctor import DoctorListSerializer, DoctorRetrieveSerializer, DoctorCreateSerializer, \
     DoctorUpdateSerializer
 from api.serializers.patient import PatientListSerializer
@@ -15,11 +15,15 @@ class DoctorView(
     mixins.UpdateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
-    mixins.DestroyModelMixin
+    mixins.DestroyModelMixin,
+    RoleBasedPermissionsMixin
 ):
     lookup_field = 'id'
 
     permission_classes = [IsAuthenticated, DoctorAccessPermission]
+
+    def get_action_permissions(self):
+        self.action_permissions = []
 
     def get_serializer_class(self):
         if self.action == 'list':
